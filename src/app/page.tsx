@@ -121,7 +121,7 @@ export default function Home() {
       <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
 
         {/* Left Column: Controls (Matrices) */}
-        <div className="lg:col-span-7 space-y-8 pb-12">
+        <div className="lg:col-span-7 space-y-8 pb-36 lg:pb-12">
 
           {/* Header */}
           <header className={`mb-8 pl-2 border-l-4 ${isAIGenerated ? 'border-cyan-600' : 'border-cyan-500'} transition-colors duration-[1000ms]`}>
@@ -328,26 +328,62 @@ export default function Home() {
         </div>
 
         {/* Mobile Preview Drawer */}
-        < div className="lg:hidden fixed bottom-0 left-0 w-full h-[60vh] bg-slate-900/90 backdrop-blur-xl rounded-t-3xl border-t border-cyan-500/20 shadow-2xl z-50 transform transition-transform duration-300 translate-y-[calc(100%-3rem)] hover:translate-y-0 focus-within:translate-y-0 group flex flex-col" >
-          <div className="h-12 flex items-center justify-center border-b border-white/5 cursor-pointer shrink-0">
-            <div className="w-12 h-1.5 bg-slate-600 rounded-full group-hover:bg-cyan-400 transition-colors"></div>
+        <div className={cn(
+          "lg:hidden fixed bottom-0 left-0 w-full backdrop-blur-xl border-t shadow-2xl z-50 transform transition-all duration-500 group flex flex-col",
+          isAIGenerated
+            ? "h-full bg-white/95 border-cyan-500/30 shadow-cyan-500/10 rounded-none"
+            : "h-[70vh] bg-slate-900/90 border-cyan-500/20 rounded-t-3xl",
+          isAIGenerated
+            ? "translate-y-0"
+            : "translate-y-[calc(100%-3rem)] hover:translate-y-0 focus-within:translate-y-0"
+        )}>
+          <div className={cn(
+            "h-12 flex items-center justify-center border-b cursor-pointer shrink-0 transition-colors duration-500",
+            isAIGenerated ? "border-slate-200" : "border-white/5"
+          )}>
+            <div className={cn(
+              "w-12 h-1.5 rounded-full transition-colors",
+              isAIGenerated ? "bg-slate-300 group-hover:bg-cyan-500" : "bg-slate-600 group-hover:bg-cyan-400"
+            )}></div>
           </div>
 
-          {/* Mobile Language Toggle */}
+          {/* Mobile Header Bar */}
           <div className="flex justify-between p-2 px-4 items-center">
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isAIGenerated ? 'bg-green-400' : 'bg-slate-600'}`}></div>
-              <span className="text-[10px] text-slate-400 font-bold">{isAIGenerated ? 'AI錬成済み' : 'ドラフト'}</span>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full transition-colors duration-500 ${isAIGenerated ? 'bg-green-500' : 'bg-slate-600'}`}></div>
+                <span className={cn(
+                  "text-[10px] font-bold transition-colors duration-500",
+                  isAIGenerated ? "text-slate-600" : "text-slate-400"
+                )}>{isAIGenerated ? 'AI錬成済み' : 'ドラフト'}</span>
+              </div>
+
+              {/* Mobile Reset Button */}
+              {isAIGenerated && (
+                <button
+                  onClick={handleReset}
+                  className="flex items-center gap-1 px-2 py-1 rounded-md bg-slate-100 border border-slate-300 text-slate-500 hover:text-slate-700 hover:border-slate-400 active:scale-95 transition-all"
+                >
+                  <RotateCcw size={12} />
+                  <span className="text-[10px] font-bold">リセット</span>
+                </button>
+              )}
             </div>
+
             <button
               onClick={toggleLocale}
-              className="text-xs px-2 py-1 bg-slate-800 rounded border border-white/10"
+              className={cn(
+                "text-xs px-2 py-1 rounded border transition-colors duration-500",
+                isAIGenerated
+                  ? "bg-slate-100 border-slate-300 text-slate-700"
+                  : "bg-slate-800 border-white/10 text-slate-300"
+              )}
             >
               出力言語: {locale === 'en' ? 'English' : '日本語'}
             </button>
           </div>
 
-          <div className="flex-grow p-4 pb-20 overflow-hidden relative">
+          <div className="flex-grow p-4 pb-20 overflow-auto relative">
             <MarkdownPreview content={generatedMd} isDraft={!isAIGenerated} />
             {isRefining && (
               <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-50">
@@ -355,7 +391,7 @@ export default function Home() {
               </div>
             )}
           </div>
-        </div >
+        </div>
 
       </div >
     </main >
