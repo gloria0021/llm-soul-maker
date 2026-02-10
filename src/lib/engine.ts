@@ -24,7 +24,7 @@ export class PersonaEngine {
         matrices.forEach((matrix: MatrixConfig) => {
             const coords = coordinates[matrix.id] || { x: 50, y: 50 };
             const { x, y } = coords;
-            const { quadrants, xAxis, yAxis } = matrix;
+            const { quadrants } = matrix;
 
             let quadrantLabel = "";
             let description = "";
@@ -57,7 +57,6 @@ export class PersonaEngine {
 
             // Transform 0-100 to -100-100 (Center=0, Left=-100, Right=100, Up=-100, Down=100)
             const displayX = (x - 50) * 2;
-            const displayY = (50 - y) * -2; // Reverse: Up is y=-100, Down is y=100. So if y=100(Up) -> -100, y=0(Down) -> 100.
             // Wait, let's re-read: "下はy=100、上はy=-100". 
             // Current code: y > 50 is Top. y < 50 is Bottom.
             // If y=100 (Top), displayY should be -100.
@@ -78,7 +77,7 @@ export class PersonaEngine {
 
         const toneStr = `[${settings.tone}] 会話量:${settings.amount}${settings.useEmoji ? ' (絵文字あり)' : ''}${settings.additional ? ` / ${settings.additional}` : ''}`;
 
-        let output = template
+        const output = template
             .replace('{{archetypes}}', '\n' + archetypeDescriptions.join('\n'))
             .replace('{{tone}}', toneStr)
             .replace('{{policies}}', '\n' + policyDescriptions.join('\n'));

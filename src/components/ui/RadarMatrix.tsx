@@ -1,8 +1,8 @@
 
 "use client";
 
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { motion } from 'framer-motion';
 import { MatrixConfig, Locale } from '@/config/types';
 import { cn } from '@/lib/utils';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -31,7 +31,7 @@ export const RadarMatrix = ({
     // x, y are 0-100.
     // Visual position needs to be mapped to the container size.
 
-    const handleInteraction = (clientX: number, clientY: number) => {
+    const handleInteraction = useCallback((clientX: number, clientY: number) => {
         if (!containerRef.current) return;
         const rect = containerRef.current.getBoundingClientRect();
 
@@ -44,7 +44,7 @@ export const RadarMatrix = ({
         newY = Math.max(0, Math.min(100, newY));
 
         onChange(Math.round(newX), Math.round(newY));
-    };
+    }, [onChange]);
 
     const onMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -78,26 +78,20 @@ export const RadarMatrix = ({
             window.removeEventListener('touchmove', onTouchMove);
             window.removeEventListener('touchend', onUp);
         };
-    }, [isDragging]);
+    }, [isDragging, handleInteraction]);
 
     // Determine current quadrant for dynamic background
     const isRight = x >= 50;
     const isTop = y >= 50;
 
-    let quadrantName = "";
-    if (isRight && isTop) quadrantName = locale === 'en' ? config.quadrants.topRight.labelEn : config.quadrants.topRight.label;
-    if (!isRight && isTop) quadrantName = locale === 'en' ? config.quadrants.topLeft.labelEn : config.quadrants.topLeft.label;
-    if (isRight && !isTop) quadrantName = locale === 'en' ? config.quadrants.bottomRight.labelEn : config.quadrants.bottomRight.label;
-    if (!isRight && !isTop) quadrantName = locale === 'en' ? config.quadrants.bottomLeft.labelEn : config.quadrants.bottomLeft.label;
-
     return (
-        <GlassCard className={cn("flex flex-col gap-4", className)}>
-            <div className="pb-2 border-b border-white/5 mb-4">
-                <h3 className="font-bold text-lg text-white/90">
+        <GlassCard className={cn("flex flex-col gap-4 transition-colors duration-[1000ms]", className)}>
+            <div className="pb-2 border-b border-slate-200/50 dark:border-white/5 mb-4 transition-colors duration-[1000ms]">
+                <h3 className="font-bold text-lg text-slate-800 dark:text-white/90 transition-colors duration-[1000ms]">
                     {locale === 'en' ? config.labelEn : config.label}
                 </h3>
                 {(config.source || config.sourceEn) && (
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 transition-colors duration-[1000ms]">
                         Source: {locale === 'en' ? config.sourceEn : config.source}
                     </p>
                 )}
@@ -106,38 +100,38 @@ export const RadarMatrix = ({
             {/* Grid Container */}
             <div
                 ref={containerRef}
-                className="relative w-full aspect-square bg-slate-900/50 rounded-lg border border-white/10 overflow-hidden cursor-crosshair touch-none select-none"
+                className="relative w-full aspect-square bg-white/50 dark:bg-slate-900/50 rounded-lg border border-slate-200 dark:border-white/10 overflow-hidden cursor-crosshair touch-none select-none transition-colors duration-[1000ms]"
                 onMouseDown={onMouseDown}
                 onTouchStart={onTouchStart}
             >
                 {/* Grid Lines */}
                 <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
-                    <div className={cn("border-r border-b border-white/5 transition-colors duration-500", !isRight && isTop ? "bg-cyan-500/10" : "")}></div>
-                    <div className={cn("border-b border-white/5 transition-colors duration-500", isRight && isTop ? "bg-purple-500/10" : "")}></div>
-                    <div className={cn("border-r border-white/5 transition-colors duration-500", !isRight && !isTop ? "bg-blue-500/10" : "")}></div>
-                    <div className={cn("transition-colors duration-500", isRight && !isTop ? "bg-emerald-500/10" : "")}></div>
+                    <div className={cn("border-r border-b border-slate-300/30 dark:border-white/5 transition-colors duration-500", !isRight && isTop ? "bg-cyan-100/30 dark:bg-cyan-500/10" : "")}></div>
+                    <div className={cn("border-b border-slate-300/30 dark:border-white/5 transition-colors duration-500", isRight && isTop ? "bg-purple-100/30 dark:bg-purple-500/10" : "")}></div>
+                    <div className={cn("border-r border-slate-300/30 dark:border-white/5 transition-colors duration-500", !isRight && !isTop ? "bg-blue-100/30 dark:bg-blue-500/10" : "")}></div>
+                    <div className={cn("transition-colors duration-500", isRight && !isTop ? "bg-emerald-100/30 dark:bg-emerald-500/10" : "")}></div>
                 </div>
 
                 {/* Center Crosshair */}
-                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white/20"></div>
-                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-white/20"></div>
+                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-slate-400/30 dark:bg-white/20 transition-colors duration-[1000ms]"></div>
+                <div className="absolute left-1/2 top-0 w-[1px] h-full bg-slate-400/30 dark:bg-white/20 transition-colors duration-[1000ms]"></div>
 
                 {/* Axis Labels (Absolute positioning) - Updated for visibility and orientation */}
                 {/* Top (Y Max) */}
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 text-xs md:text-sm text-cyan-200/80 font-bold tracking-widest text-center bg-slate-900/50 px-2 rounded backdrop-blur-sm z-0">
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 text-xs md:text-sm text-cyan-700 dark:text-cyan-200/80 font-bold tracking-widest text-center bg-white/80 dark:bg-slate-900/50 px-2 rounded backdrop-blur-sm z-0 transition-colors duration-[1000ms]">
                     {locale === 'en' ? config.yAxis.labelMaxEn : config.yAxis.labelMax} ↑
                 </div>
                 {/* Bottom (Y Min) */}
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs md:text-sm text-cyan-200/80 font-bold tracking-widest text-center bg-slate-900/50 px-2 rounded backdrop-blur-sm z-0">
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs md:text-sm text-cyan-700 dark:text-cyan-200/80 font-bold tracking-widest text-center bg-white/80 dark:bg-slate-900/50 px-2 rounded backdrop-blur-sm z-0 transition-colors duration-[1000ms]">
                     {locale === 'en' ? config.yAxis.labelMinEn : config.yAxis.labelMin} ↓
                 </div>
 
                 {/* Left (X Min) */}
-                <div className="absolute top-1/2 left-2 -translate-y-1/2 text-xs md:text-sm text-cyan-200/80 font-bold tracking-widest text-left bg-slate-900/50 px-1 py-1 rounded backdrop-blur-sm z-0">
+                <div className="absolute top-1/2 left-2 -translate-y-1/2 text-xs md:text-sm text-cyan-700 dark:text-cyan-200/80 font-bold tracking-widest text-left bg-white/80 dark:bg-slate-900/50 px-1 py-1 rounded backdrop-blur-sm z-0 transition-colors duration-[1000ms]">
                     ← {locale === 'en' ? config.xAxis.labelMinEn : config.xAxis.labelMin}
                 </div>
                 {/* Right (X Max) */}
-                <div className="absolute top-1/2 right-2 -translate-y-1/2 text-xs md:text-sm text-cyan-200/80 font-bold tracking-widest text-right bg-slate-900/50 px-1 py-1 rounded backdrop-blur-sm z-0">
+                <div className="absolute top-1/2 right-2 -translate-y-1/2 text-xs md:text-sm text-cyan-700 dark:text-cyan-200/80 font-bold tracking-widest text-right bg-white/80 dark:bg-slate-900/50 px-1 py-1 rounded backdrop-blur-sm z-0 transition-colors duration-[1000ms]">
                     {locale === 'en' ? config.xAxis.labelMaxEn : config.xAxis.labelMax} →
                 </div>
 

@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -31,7 +31,7 @@ export const NeonSlider = ({
 
     const percentage = ((value - min) / (max - min)) * 100;
 
-    const handleInteraction = (e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent) => {
+    const handleInteraction = useCallback((e: React.MouseEvent | React.TouchEvent | MouseEvent | TouchEvent) => {
         if (!trackRef.current) return;
 
         const rect = trackRef.current.getBoundingClientRect();
@@ -47,7 +47,7 @@ export const NeonSlider = ({
         const newValue = Math.round((newPercentage / 100) * (max - min) + min);
 
         onChange(newValue);
-    };
+    }, [max, min, onChange]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
@@ -93,16 +93,16 @@ export const NeonSlider = ({
             window.removeEventListener('touchmove', handleGlobalTouchMove);
             window.removeEventListener('touchend', handleGlobalTouchEnd);
         };
-    }, [isDragging, max, min, onChange]);
+    }, [isDragging, handleInteraction]);
 
     return (
-        <div className={cn("w-full py-4 select-none", className)}>
+        <div className={cn("w-full py-4 select-none transition-colors duration-[1000ms]", className)}>
             {/* Label Header */}
             <div className="flex justify-between items-end mb-3">
-                <span className="text-white/90 font-medium tracking-wide text-sm md:text-base">
+                <span className="text-slate-800 dark:text-white/90 font-medium tracking-wide text-sm md:text-base transition-colors duration-[1000ms]">
                     {label}
                 </span>
-                <span className="text-cyan-400 font-mono text-xs md:text-sm bg-cyan-950/30 px-2 py-0.5 rounded border border-cyan-500/20">
+                <span className="text-cyan-700 dark:text-cyan-400 font-mono text-xs md:text-sm bg-cyan-100 dark:bg-cyan-950/30 px-2 py-0.5 rounded border border-cyan-400/50 dark:border-cyan-500/20 transition-colors duration-[1000ms]">
                     {value}%
                 </span>
             </div>
@@ -115,7 +115,7 @@ export const NeonSlider = ({
                 onTouchStart={handleTouchStart}
             >
                 {/* Background Track */}
-                <div className="absolute w-full h-1.5 bg-slate-800/50 rounded-full overflow-hidden backdrop-blur-sm border border-slate-700/30">
+                <div className="absolute w-full h-1.5 bg-slate-200/50 dark:bg-slate-800/50 rounded-full overflow-hidden backdrop-blur-sm border border-slate-300 dark:border-slate-700/30 transition-colors duration-[1000ms]">
                     {/* Active Fill with Gradient */}
                     <motion.div
                         className="h-full bg-gradient-to-r from-cyan-900 via-cyan-500 to-blue-500"
@@ -127,7 +127,7 @@ export const NeonSlider = ({
 
                 {/* Thumb (The glowing orb) */}
                 <motion.div
-                    className="absolute h-5 w-5 bg-white rounded-full shadow-[0_0_15px_rgba(6,182,212,0.6)] border-2 border-cyan-400 z-10"
+                    className="absolute h-5 w-5 bg-white rounded-full shadow-[0_0_15px_rgba(6,182,212,0.4)] dark:shadow-[0_0_15px_rgba(6,182,212,0.6)] border-2 border-cyan-400 z-10"
                     style={{ left: `calc(${percentage}% - 10px)` }}
                     animate={{ scale: isDragging ? 1.2 : 1 }}
                     whileHover={{ scale: 1.2 }}
@@ -137,11 +137,11 @@ export const NeonSlider = ({
             </div>
 
             {/* Axis Labels */}
-            <div className="flex justify-between mt-2 text-[10px] md:text-xs text-slate-400 font-light">
-                <span className={cn("transition-colors duration-300", percentage < 30 ? "text-cyan-200/80" : "")}>
+            <div className="flex justify-between mt-2 text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-light transition-colors duration-[1000ms]">
+                <span className={cn("transition-colors duration-300", percentage < 30 ? "text-cyan-600 dark:text-cyan-200/80" : "")}>
                     {leftLabel}
                 </span>
-                <span className={cn("transition-colors duration-300", percentage > 70 ? "text-cyan-200/80" : "")}>
+                <span className={cn("transition-colors duration-300", percentage > 70 ? "text-cyan-600 dark:text-cyan-200/80" : "")}>
                     {rightLabel}
                 </span>
             </div>

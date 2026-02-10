@@ -1,10 +1,11 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+export const runtime = 'edge';
+
+import React, { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
-import { BrainCircuit, Settings, Wand2, Globe, Terminal, RotateCcw } from 'lucide-react';
+import { BrainCircuit, Settings, Wand2, Globe, RotateCcw } from 'lucide-react';
 
 import { GlassCard } from '@/components/ui/GlassCard';
 import { RadarMatrix } from '@/components/ui/RadarMatrix';
@@ -14,11 +15,10 @@ import { PersonaEngine } from '@/lib/engine';
 import { Config, Locale, MatrixCoordinates, MatrixConfig } from '@/config/types';
 import personaConfig from '@/config/persona-config.json';
 
-export default function Home() {
-  // --- Initialization ---
-  const config = personaConfig as unknown as Config;
-  const engine = new PersonaEngine(); // No arguments for constructor
+const config = personaConfig as unknown as Config;
+const engine = new PersonaEngine();
 
+export default function Home() {
   // --- State ---
   const [convTone, setConvTone] = useState<'ため口' | '普通' | '敬語'>('普通');
   const [convAmount, setConvAmount] = useState<'少ない' | '普通' | '多い'>('普通');
@@ -38,12 +38,12 @@ export default function Home() {
   const [isAIGenerated, setIsAIGenerated] = useState(false);
 
   // --- Helpers ---
-  const currentSettings = {
+  const currentSettings = useMemo(() => ({
     tone: convTone,
     amount: convAmount,
     useEmoji,
     additional: additionalSettings
-  };
+  }), [convTone, convAmount, useEmoji, additionalSettings]);
 
   // --- Effects ---
   useEffect(() => {
@@ -51,7 +51,7 @@ export default function Home() {
     const md = engine.generate(currentSettings, coordinates, locale);
     setGeneratedMd(md);
     setIsAIGenerated(false); // Reset AI status when parameters change
-  }, [convTone, convAmount, useEmoji, additionalSettings, coordinates, locale]);
+  }, [currentSettings, coordinates, locale]);
 
   // --- Handlers ---
   const handleMatrixChange = (id: string, x: number, y: number) => {
@@ -96,10 +96,10 @@ export default function Home() {
     <button
       onClick={onClick}
       className={cn(
-        "px-6 py-2.5 rounded-lg text-sm font-bold transition-all border shrink-0",
+        "px-6 py-2.5 rounded-lg text-sm font-bold transition-all border shrink-0 duration-500",
         active
-          ? "bg-cyan-500/20 border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]"
-          : "bg-slate-900/40 border-white/5 text-slate-500 hover:bg-slate-800 hover:border-white/10"
+          ? "bg-cyan-500/10 border-cyan-600 text-cyan-700 shadow-[0_0_15px_rgba(6,182,212,0.2)] dark:bg-cyan-500/20 dark:border-cyan-500 dark:text-cyan-400 dark:shadow-[0_0_15px_rgba(6,182,212,0.3)]"
+          : "bg-white/40 border-slate-200/50 text-slate-600 hover:bg-slate-100 hover:border-slate-300 dark:bg-slate-900/40 dark:border-white/5 dark:text-slate-500 dark:hover:bg-slate-800 dark:hover:border-white/10"
       )}
     >
       {label}
@@ -107,12 +107,15 @@ export default function Home() {
   );
 
   return (
-    <main className="min-h-screen bg-black text-white selection:bg-cyan-500/30 font-sans overflow-x-hidden p-4 md:p-8">
+    <main className={cn(
+      "min-h-screen font-sans overflow-x-hidden p-4 md:p-8 transition-colors duration-[1000ms] ease-in-out",
+      isAIGenerated ? "bg-slate-50/80 text-slate-800" : "dark bg-black text-white"
+    )}>
       {/* Background Ambience */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-900/10 rounded-full blur-[120px] animate-pulse-slow"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-900/10 rounded-full blur-[120px] animate-pulse-slow delay-1000"></div>
-        <div className="absolute top-[20%] right-[20%] w-[20%] h-[20%] bg-purple-900/5 rounded-full blur-[80px]"></div>
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-cyan-500/10 dark:bg-cyan-900/10 rounded-full blur-[120px] animate-pulse-slow transition-colors duration-[1000ms]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 dark:bg-blue-900/10 rounded-full blur-[120px] animate-pulse-slow delay-1000 transition-colors duration-[1000ms]"></div>
+        <div className="absolute top-[20%] right-[20%] w-[20%] h-[20%] bg-purple-500/5 dark:bg-purple-900/5 rounded-full blur-[80px] transition-colors duration-[1000ms]"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
@@ -121,27 +124,32 @@ export default function Home() {
         <div className="lg:col-span-7 space-y-8 pb-12">
 
           {/* Header */}
-          <header className="mb-8 pl-2 border-l-4 border-cyan-500">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white via-cyan-100 to-cyan-400">
+          <header className={`mb-8 pl-2 border-l-4 ${isAIGenerated ? 'border-cyan-600' : 'border-cyan-500'} transition-colors duration-[1000ms]`}>
+            <h1 className={cn(
+              "text-4xl md:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r transition-all duration-[1000ms]",
+              isAIGenerated
+                ? "from-cyan-900 via-cyan-600 to-blue-600"
+                : "from-white via-cyan-100 to-cyan-400"
+            )}>
               魂の生き写し
             </h1>
-            <p className="text-cyan-200/60 mt-2 text-sm md:text-base tracking-wide flex items-center gap-2">
+            <p className="text-cyan-700/60 dark:text-cyan-200/60 mt-2 text-sm md:text-base tracking-wide flex items-center gap-2 transition-colors duration-[1000ms]">
               <BrainCircuit size={16} /> 自己深層心理のデジタル錬成システム
             </p>
           </header>
 
           {/* Tone & Style Settings Section */}
-          <GlassCard className="border-t border-white/10" delay={0.1}>
+          <GlassCard className="border-t border-white/20 dark:border-white/10" delay={0.1}>
             <div className="flex items-center gap-3 mb-8">
-              <Settings className="text-cyan-400" size={24} />
-              <h2 className="text-2xl font-semibold tracking-tight">会話のスタイル</h2>
+              <Settings className="text-cyan-600 dark:text-cyan-400 transition-colors duration-[1000ms]" size={24} />
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-800 dark:text-gray-100 transition-colors duration-[1000ms]">会話のスタイル</h2>
             </div>
 
             <div className="space-y-10">
               {/* Row 1: Tone and Amount */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-4">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] pl-1">会話のトーン</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">会話のトーン</label>
                   <div className="flex flex-wrap gap-3">
                     <ChoiceButton active={convTone === 'ため口'} label="ため口" onClick={() => setConvTone('ため口')} />
                     <ChoiceButton active={convTone === '普通'} label="普通" onClick={() => setConvTone('普通')} />
@@ -150,7 +158,7 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] pl-1">会話量</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">会話量</label>
                   <div className="flex flex-wrap gap-3">
                     <ChoiceButton active={convAmount === '少ない'} label="少ない" onClick={() => setConvAmount('少ない')} />
                     <ChoiceButton active={convAmount === '普通'} label="普通" onClick={() => setConvAmount('普通')} />
@@ -162,7 +170,7 @@ export default function Home() {
               {/* Row 2: Emoji and Additional */}
               <div className="space-y-10">
                 <div className="space-y-4">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] pl-1">絵文字の使用</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">絵文字の使用</label>
                   <div className="flex gap-3">
                     <ChoiceButton active={!useEmoji} label="OFF" onClick={() => setUseEmoji(false)} />
                     <ChoiceButton active={useEmoji} label="ON" onClick={() => setUseEmoji(true)} />
@@ -170,16 +178,16 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-4">
-                  <label className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em] pl-1">追加のこだわり（任意）</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">追加のこだわり（任意）</label>
                   <div className="relative group">
                     <input
                       type="text"
                       value={additionalSettings}
                       onChange={(e) => setAdditionalSettings(e.target.value)}
                       placeholder="例：『時折ため息を吐く』『結論から話す』..."
-                      className="w-full bg-slate-900/50 border border-slate-700/50 rounded-xl p-4 pl-12 text-base focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-slate-600"
+                      className="w-full bg-white/50 border border-slate-200 dark:bg-slate-900/50 dark:border-slate-700/50 rounded-xl p-4 pl-12 text-base text-slate-800 dark:text-gray-100 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 duration-[1000ms]"
                     />
-                    <Wand2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-cyan-400 transition-colors" size={20} />
+                    <Wand2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-cyan-600 dark:group-focus-within:text-cyan-400 transition-colors duration-500" size={20} />
                   </div>
                 </div>
               </div>
@@ -189,7 +197,7 @@ export default function Home() {
           {/* Matrices Grid (2x2) */}
           < div className="grid grid-cols-1 md:grid-cols-2 gap-6" >
             {
-              config.matrices.map((m: MatrixConfig, idx: number) => (
+              config.matrices.map((m: MatrixConfig) => (
                 <RadarMatrix
                   key={m.id}
                   config={m}
@@ -209,11 +217,11 @@ export default function Home() {
           <div className="sticky top-8 h-[calc(100vh-4rem)] flex flex-col gap-4">
 
             {/* Header Bar: Status & Language */}
-            <div className="flex items-center justify-between p-2 bg-slate-900/40 backdrop-blur rounded-lg border border-white/10">
+            <div className="flex items-center justify-between p-2 bg-white/40 dark:bg-slate-900/40 backdrop-blur rounded-lg border border-slate-200/50 dark:border-white/10 transition-colors duration-[1000ms]">
               <div className="flex items-center gap-4 pl-2">
                 <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${isAIGenerated ? 'bg-green-400 animate-pulse' : 'bg-slate-600'}`}></div>
-                  <span className="text-sm text-slate-400 uppercase tracking-widest font-bold">
+                  <div className={`w-3 h-3 rounded-full transition-all duration-500 ${isAIGenerated ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.6)] animate-pulse' : 'bg-slate-400 dark:bg-slate-600'}`}></div>
+                  <span className="text-sm text-slate-600 dark:text-slate-400 uppercase tracking-widest font-bold transition-colors duration-[1000ms]">
                     {isAIGenerated ? 'AI錬成済' : 'DRAFT'}
                   </span>
                 </div>
@@ -221,7 +229,7 @@ export default function Home() {
                 {/* Reset Button */}
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-slate-800 text-slate-500 hover:text-white transition-all border border-transparent hover:border-white/5 active:scale-95"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white transition-all border border-transparent hover:border-slate-300 dark:hover:border-white/5 active:scale-95 duration-300"
                   title="設定をリセット"
                 >
                   <RotateCcw size={14} />
@@ -230,15 +238,15 @@ export default function Home() {
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-400 uppercase tracking-widest font-bold">出力言語</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400 uppercase tracking-widest font-bold transition-colors duration-[1000ms]">出力言語</span>
                 <button
                   onClick={toggleLocale}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-800 hover:bg-slate-700 transition-colors border border-white/5 active:scale-95"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-white/5 active:scale-95 duration-300"
                 >
-                  <Globe size={14} className={locale === 'en' ? 'text-cyan-400' : 'text-slate-500'} />
-                  <span className={locale === 'en' ? 'text-cyan-400 font-bold' : 'text-slate-300'}>EN</span>
-                  <span className="text-slate-600">|</span>
-                  <span className={locale === 'ja' ? 'text-cyan-400 font-bold' : 'text-slate-300'}>JP</span>
+                  <Globe size={14} className={locale === 'en' ? 'text-cyan-600 dark:text-cyan-400' : 'text-slate-400 dark:text-slate-500'} />
+                  <span className={locale === 'en' ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'text-slate-500 dark:text-slate-300'}>EN</span>
+                  <span className="text-slate-300 dark:text-slate-600">|</span>
+                  <span className={locale === 'ja' ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'text-slate-500 dark:text-slate-300'}>JP</span>
                 </button>
               </div>
             </div>
@@ -270,8 +278,12 @@ export default function Home() {
               <div className="absolute -inset-1 bg-cyan-500/30 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             </button>
 
-            <div className={`flex-grow flex flex-col bg-slate-900/40 backdrop-blur-xl rounded-2xl border transition-colors duration-500 overflow-hidden relative shadow-2xl ${isAIGenerated ? 'border-cyan-500/50 shadow-cyan-500/10' : 'border-white/10'}`}>
-              <MarkdownPreview content={generatedMd} isDraft={!isAIGenerated} />
+            <div className={`flex-grow flex flex-col bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl rounded-2xl border transition-colors duration-[1000ms] overflow-hidden relative shadow-2xl ${isAIGenerated ? 'border-cyan-500/50 shadow-cyan-500/10' : 'border-slate-200 dark:border-white/10'}`}>
+              <MarkdownPreview
+                content={generatedMd}
+                isDraft={!isAIGenerated}
+                onChange={setGeneratedMd}
+              />
               {isRefining && (
                 <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center z-50 animate-in fade-in transition-all">
                   <div className="relative">
