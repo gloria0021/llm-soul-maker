@@ -299,6 +299,34 @@ export default function Home() {
           </div>
         </div >
 
+        {/* Mobile Floating AI Button */}
+        <div className="lg:hidden fixed bottom-16 left-0 w-full px-4 z-[60]">
+          <button
+            onClick={handleRefineWithAI}
+            disabled={isRefining}
+            className="relative group overflow-hidden w-full py-3.5 rounded-2xl font-bold transition-all disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed shadow-[0_4px_30px_rgba(6,182,212,0.4)]"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 bg-[length:200%_auto] animate-gradient-x"></div>
+            <div className="absolute inset-0 opacity-0 group-active:opacity-20 bg-[radial-gradient(circle_at_center,white,transparent)] transition-opacity"></div>
+
+            <span className="relative flex items-center justify-center gap-3 text-lg tracking-[0.2em] font-black text-white drop-shadow-lg">
+              {isRefining ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  魂を錬成中...
+                </>
+              ) : (
+                <>
+                  <Wand2 size={20} className="animate-pulse" />
+                  魂の錬成
+                </>
+              )}
+            </span>
+
+            <div className="absolute -inset-1 bg-cyan-500/30 blur-xl opacity-50 group-active:opacity-100 transition-opacity duration-700"></div>
+          </button>
+        </div>
+
         {/* Mobile Preview Drawer */}
         < div className="lg:hidden fixed bottom-0 left-0 w-full h-[60vh] bg-slate-900/90 backdrop-blur-xl rounded-t-3xl border-t border-cyan-500/20 shadow-2xl z-50 transform transition-transform duration-300 translate-y-[calc(100%-3rem)] hover:translate-y-0 focus-within:translate-y-0 group flex flex-col" >
           <div className="h-12 flex items-center justify-center border-b border-white/5 cursor-pointer shrink-0">
