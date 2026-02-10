@@ -108,7 +108,7 @@ export default function Home() {
 
   return (
     <main className={cn(
-      "min-h-screen font-sans overflow-x-hidden p-4 md:p-8 transition-colors duration-[1000ms] ease-in-out",
+      "min-h-screen font-sans p-4 md:p-8 transition-colors duration-[1000ms] ease-in-out",
       isAIGenerated ? "bg-slate-50/80 text-slate-800" : "dark bg-black text-white"
     )}>
       {/* Background Ambience */}
@@ -118,25 +118,32 @@ export default function Home() {
         <div className="absolute top-[20%] right-[20%] w-[20%] h-[20%] bg-purple-500/5 dark:bg-purple-900/5 rounded-full blur-[80px] transition-colors duration-[1000ms]"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+      {/* Sticky Header */}
+      <header className={cn(
+        "sticky top-0 z-30 pl-6 py-4 md:py-6 border-l-4 backdrop-blur-xl transition-colors duration-[1000ms]",
+        isAIGenerated
+          ? "border-cyan-600 bg-slate-50/80"
+          : "border-cyan-500 bg-black/80"
+      )}>
+        <div className="max-w-7xl mx-auto">
+          <h1 className={cn(
+            "text-3xl md:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r transition-all duration-[1000ms]",
+            isAIGenerated
+              ? "from-cyan-900 via-cyan-600 to-blue-600"
+              : "from-white via-cyan-100 to-cyan-400"
+          )}>
+            魂の生き写し
+          </h1>
+          <p className="text-cyan-700/60 dark:text-cyan-200/60 mt-1 text-sm md:text-base tracking-wide flex items-center gap-2 transition-colors duration-[1000ms]">
+            <BrainCircuit size={16} /> 自己深層心理のデジタル錬成システム
+          </p>
+        </div>
+      </header>
+
+      <div className="relative z-10 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
 
         {/* Left Column: Controls (Matrices) */}
         <div className="lg:col-span-7 space-y-8 pb-36 lg:pb-12">
-
-          {/* Header */}
-          <header className={`mb-8 pl-2 border-l-4 ${isAIGenerated ? 'border-cyan-600' : 'border-cyan-500'} transition-colors duration-[1000ms]`}>
-            <h1 className={cn(
-              "text-4xl md:text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r transition-all duration-[1000ms]",
-              isAIGenerated
-                ? "from-cyan-900 via-cyan-600 to-blue-600"
-                : "from-white via-cyan-100 to-cyan-400"
-            )}>
-              魂の生き写し
-            </h1>
-            <p className="text-cyan-700/60 dark:text-cyan-200/60 mt-2 text-sm md:text-base tracking-wide flex items-center gap-2 transition-colors duration-[1000ms]">
-              <BrainCircuit size={16} /> 自己深層心理のデジタル錬成システム
-            </p>
-          </header>
 
           {/* Tone & Style Settings Section */}
           <GlassCard className="border-t border-white/20 dark:border-white/10" delay={0.1}>
@@ -146,11 +153,11 @@ export default function Home() {
             </div>
 
             <div className="space-y-10">
-              {/* Row 1: Tone and Amount */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Row 1: Tone, Amount, Emoji in one row */}
+              <div className="grid grid-cols-3 gap-6">
                 <div className="space-y-4">
                   <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">会話のトーン</label>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2">
                     <ChoiceButton active={convTone === 'ため口'} label="ため口" onClick={() => setConvTone('ため口')} />
                     <ChoiceButton active={convTone === '普通'} label="普通" onClick={() => setConvTone('普通')} />
                     <ChoiceButton active={convTone === '敬語'} label="敬語" onClick={() => setConvTone('敬語')} />
@@ -159,36 +166,33 @@ export default function Home() {
 
                 <div className="space-y-4">
                   <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">会話量</label>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2">
                     <ChoiceButton active={convAmount === '少ない'} label="少ない" onClick={() => setConvAmount('少ない')} />
                     <ChoiceButton active={convAmount === '普通'} label="普通" onClick={() => setConvAmount('普通')} />
                     <ChoiceButton active={convAmount === '多い'} label="多い" onClick={() => setConvAmount('多い')} />
                   </div>
                 </div>
-              </div>
 
-              {/* Row 2: Emoji and Additional */}
-              <div className="space-y-10">
                 <div className="space-y-4">
                   <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">絵文字の使用</label>
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <ChoiceButton active={!useEmoji} label="OFF" onClick={() => setUseEmoji(false)} />
                     <ChoiceButton active={useEmoji} label="ON" onClick={() => setUseEmoji(true)} />
                   </div>
                 </div>
+              </div>
 
-                <div className="space-y-4">
-                  <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">追加のこだわり（任意）</label>
-                  <div className="relative group">
-                    <input
-                      type="text"
-                      value={additionalSettings}
-                      onChange={(e) => setAdditionalSettings(e.target.value)}
-                      placeholder="例：『時折ため息を吐く』『結論から話す』..."
-                      className="w-full bg-white/50 border border-slate-200 dark:bg-slate-900/50 dark:border-slate-700/50 rounded-xl p-4 pl-12 text-base text-slate-800 dark:text-gray-100 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 duration-[1000ms]"
-                    />
-                    <Wand2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-cyan-600 dark:group-focus-within:text-cyan-400 transition-colors duration-500" size={20} />
-                  </div>
+              <div className="space-y-4">
+                <label className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-[0.2em] pl-1 transition-colors duration-[1000ms]">追加のこだわり（任意）</label>
+                <div className="relative group">
+                  <input
+                    type="text"
+                    value={additionalSettings}
+                    onChange={(e) => setAdditionalSettings(e.target.value)}
+                    placeholder="例：『時折ため息を吐く』『結論から話す』..."
+                    className="w-full bg-white/50 border border-slate-200 dark:bg-slate-900/50 dark:border-slate-700/50 rounded-xl p-4 pl-12 text-base text-slate-800 dark:text-gray-100 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 duration-[1000ms]"
+                  />
+                  <Wand2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within:text-cyan-600 dark:group-focus-within:text-cyan-400 transition-colors duration-500" size={20} />
                 </div>
               </div>
             </div>
@@ -213,7 +217,7 @@ export default function Home() {
         </div >
 
         {/* Right Column: Preview (Sticky) */}
-        < div className="lg:col-span-5 relative hidden lg:block" >
+        <div className="lg:col-span-5 relative hidden lg:block">
           <div className="sticky top-8 h-[calc(100vh-4rem)] flex flex-col gap-4">
 
             {/* Header Bar: Status & Language */}
@@ -255,7 +259,7 @@ export default function Home() {
             <button
               onClick={handleRefineWithAI}
               disabled={isRefining}
-              className="relative group overflow-hidden w-full py-4 rounded-xl font-bold transition-all disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed shadow-xl"
+              className="relative group overflow-hidden w-full py-4 rounded-xl font-bold transition-all disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed shadow-xl shrink-0"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 bg-[length:200%_auto] animate-gradient-x group-hover:scale-105 transition-transform duration-500"></div>
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-[radial-gradient(circle_at_center,white,transparent)] transition-opacity"></div>
@@ -297,7 +301,7 @@ export default function Home() {
               )}
             </div>
           </div>
-        </div >
+        </div>
 
         {/* Mobile Floating AI Button */}
         <div className="lg:hidden fixed bottom-16 left-0 w-full px-4 z-[60]">

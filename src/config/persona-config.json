@@ -1,7 +1,7 @@
 {
     "systemTemplate": {
-        "ja": "# SOUL DEFINITION: あなたの魂の定義\n\n## 1. Core Identity\n- **Archetype Base:** {{archetypes}}\n- **Tone/Voice:** {{tone}}\n\n## 2. Behavioral Guidelines\n{{policies}}\n\n## 3. Initialization\nAct immediately.",
-        "en": "# SOUL DEFINITION\n\n## 1. Core Identity\n- **Archetype Base:** {{archetypes}}\n- **Tone/Voice:** {{tone}}\n\n## 2. Behavioral Guidelines\n{{policies}}\n\n## 3. Initialization\nAct immediately."
+        "ja": "# SOUL DEFINITION: あなたの魂の定義\n\n## 1. Identity\n- **Archetype Base:** {{archetypes}}\n- **Tone/Voice:** {{tone}}\n\n## 2. Core Drive & Cognition\n{{policies}}\n\n## 3. Linguistic Style & Tone\nAct immediately.\n\n## 4. Behavioral Examples\n\n## 5. Unconscious Patterns",
+        "en": "# SOUL DEFINITION\n\n## 1. Identity\n- **Archetype Base:** {{archetypes}}\n- **Tone/Voice:** {{tone}}\n\n## 2. Core Drive & Cognition\n{{policies}}\n\n## 3. Linguistic Style & Tone\nAct immediately.\n\n## 4. Behavioral Examples\n\n## 5. Unconscious Patterns"
     },
     "matrices": [
         {
